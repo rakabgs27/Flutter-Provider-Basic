@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 void main() {
   runApp(
-   Provider(
+   ChangeNotifierProvider(
       create: (_) => Person(name: " Raka Bagas Fitriansyah", age: 20),
       child: const MyApp(),
     ),
@@ -40,7 +40,16 @@ class MyNamePage extends StatelessWidget {
            '''
           Hi ${Provider.of<Person>(context).name}!
           You are ${Provider.of<Person>(context).age} years old''',
+          style: const TextStyle(
+            fontSize: 20
           ),
+          ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){
+          Provider.of<Person>(context,listen: false).increaseAge();
+      },
+      child: Icon(Icons.add),
       ),
     );
   }

@@ -1,4 +1,6 @@
-class Person{
+import 'package:flutter/material.dart';
+
+class Person with ChangeNotifier{
   String name;
   int age;
 
@@ -6,4 +8,9 @@ class Person{
     required this.name,
     required this.age
   });
+
+  void increaseAge(){
+    age++;
+    notifyListeners();
+  }
 }
