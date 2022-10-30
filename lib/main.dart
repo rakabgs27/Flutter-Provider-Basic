@@ -1,31 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class Person {
-  final String name;
-  final int initialAge;
+class Person with ChangeNotifier {
+  String name;
+  int age;
   Person({
     required this.name, 
-    required this.initialAge
+    required this.age
     });
 
-  Stream<String> get age async* {
-      var i = initialAge;
-      while (i < 85) {
-        await Future.delayed(Duration(seconds: 1), () {
-          i++;
-        });
-        yield i.toString();
-      }
+  void increaseAge() {
+    age++;
+    notifyListeners();
+  }
+
+  void changeName() {
+    name = "Gary";
+    notifyListeners();
+  }
+}
+
+class Countdown {
+  static Stream<String> start() async* {
+    var i = 10;
+    while (i > 0) {
+      await Future.delayed(Duration(seconds: 1), () {
+        i++;
+        i--;
+      });
+      yield i.toString();
+    }
+
+    yield "bLAsT oFf !!!";
   }
 }
 
 void main() {
   runApp(
-  StreamProvider<String>(
-      create: (_) => Person(name: 'Yohan', initialAge: 25).age,
-      initialData: 25.toString(),
-      catchError: (_, error) => error.toString(),
+   MultiProvider(
+      providers: [
+        StreamProvider<String>(
+          create: (_) => Countdown.start(),
+          initialData: "Begin countdown...",
+          catchError: (_, error) => error.toString(),
+        ),
+        ChangeNotifierProvider<Person>(
+          create: (_) => Person(name: 'Ghani', age: 25),
+        ),
+      ],
       child: MyApp(),
    )
   );
@@ -47,24 +69,49 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
      return Scaffold(
       appBar: AppBar(
-        title: Text("Future Provider"),
+        title: Text("Context Provider"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Center(
-          child: Consumer<String>(
-            builder: (context, String age, child) {
-              return Column(
-                children: <Widget>[
-                  Text("Watch Yohan Age..."),
-                  Text("name: Yohan"),
-                  Text("age: $age"),
-                ],
-              );
-            },
-          ),
+        child: Text_tengah(),
         ),
-      )
+        floatingActionButton: button_increase(),
+      );
+    }
+  }
+
+    class Text_tengah extends StatelessWidget {
+      const Text_tengah({
+        Key? key,
+      }) : super(key: key);
+
+      @override
+      Widget build(BuildContext context) {
+        return Center(
+          child: Column(
+            children: <Widget>[
+              Text("Name: ${context.select(
+                (Person p) => p.name,
+                )}"),
+              Text("context.select: ${context.select((Person p) => p.age)}"),
+              Text("context.watch: ${context.watch<String>()}"),
+            ],
+          )
+        );
+    }
+  }
+
+  class button_increase extends StatelessWidget {
+  const button_increase({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () {
+        context.read<Person>().increaseAge();
+      },
     );
-}
+  }
 }
