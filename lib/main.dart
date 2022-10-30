@@ -30,8 +30,9 @@ class MyNamePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Person>(
-      builder: (context, person, _){
+    return Selector<Person, String>(
+      selector: (_, Person person) => person.name,
+      builder: (context, String name, child) {
         return Scaffold(
       appBar: AppBar(title: Text('Title'),
       ),
@@ -39,8 +40,8 @@ class MyNamePage extends StatelessWidget {
         child: 
           Text(
            '''
-          Hi ${person.name}!
-          You are ${person.age} years old''',
+           Hi ${name}!
+          You are ${Provider.of<Person>(context).age} years old''',
           style: const TextStyle(
             fontSize: 20
           ),
@@ -49,7 +50,6 @@ class MyNamePage extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: (){
           Provider.of<Person>(context,listen: false).increaseAge();
-          person.increaseAge();
       },
       child: Icon(Icons.add),
       ),
