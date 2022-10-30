@@ -1,59 +1,77 @@
-import 'package:testingprovider/person.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+class Person {
+  final String name;
+  int age;
+  Person({
+    required this.name, 
+    required this.age
+    });
+}
+
+class Home {
+  final String city = "Portland";
+
+  Future<String> get fetchAddress {
+    final address = Future.delayed(const Duration(seconds: 5), () {
+      return '1234 North Commercial Ave.';
+    });
+
+    return address;
+  }
+}
+
 void main() {
   runApp(
-   ChangeNotifierProvider(
-      create: (_) => Person(name: " Raka Bagas Fitriansyah", age: 20),
-      child: const MyApp(),
-    ),
+   Provider<Person>(
+      create: (_) => Person(name: 'Yohan', age: 25),
+      child: FutureProvider<String>(
+        create: (context) => Home().fetchAddress,
+        initialData: "fetching address...",
+        child: MyApp(),
+      ),
+   )
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyNamePage(),
+      home: MyHomePage(),
     );
   }
 }
 
-class MyNamePage extends StatelessWidget {
+class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<Person, String>(
-      selector: (_, Person person) => person.name,
-      builder: (context, String name, child) {
-        return Scaffold(
-      appBar: AppBar(title: Text('Title'),
+     return Scaffold(
+      appBar: AppBar(
+        title: Text("Future Provider"),
       ),
-      body: Center(
-        child: 
-          Text(
-           '''
-           Hi ${name}!
-          You are ${Provider.of<Person>(context).age} years old''',
-          style: const TextStyle(
-            fontSize: 20
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Consumer<Person>(
+            builder: (context, Person person, child) {
+              return Column(
+                children: <Widget>[
+                  Text("User profile:"),
+                  Text("name: ${person.name}"),
+                  Text("age: ${person.age}"),
+                  Consumer<String>(builder: (context, String address, child) {
+                    return Text("address: $address");
+                  }),
+                ],
+              );
+            },
           ),
-          ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: (){
-          Provider.of<Person>(context,listen: false).increaseAge();
-      },
-      child: Icon(Icons.add),
-      ),
+        ),
+      )
     );
-    });
-  }
+}
 }
