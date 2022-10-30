@@ -21,25 +21,26 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyNamePage(),
+      home: MyNamePage(),
     );
   }
 }
 
 class MyNamePage extends StatelessWidget {
-  const MyNamePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Consumer<Person>(
+      builder: (context, person, _){
+        return Scaffold(
       appBar: AppBar(title: Text('Title'),
       ),
       body: Center(
         child: 
           Text(
            '''
-          Hi ${Provider.of<Person>(context).name}!
-          You are ${Provider.of<Person>(context).age} years old''',
+          Hi ${person.name}!
+          You are ${person.age} years old''',
           style: const TextStyle(
             fontSize: 20
           ),
@@ -48,9 +49,11 @@ class MyNamePage extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: (){
           Provider.of<Person>(context,listen: false).increaseAge();
+          person.increaseAge();
       },
       child: Icon(Icons.add),
       ),
     );
+    });
   }
 }
