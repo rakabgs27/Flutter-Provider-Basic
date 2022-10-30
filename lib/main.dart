@@ -24,13 +24,16 @@ class Home {
 
 void main() {
   runApp(
-   Provider<Person>(
-      create: (_) => Person(name: 'Yohan', age: 25),
-      child: FutureProvider<String>(
-        create: (context) => Home().fetchAddress,
-        initialData: "fetching address...",
-        child: MyApp(),
-      ),
+   MultiProvider(
+      providers: [
+        Provider<Person>(
+          create: (context) => Person(name: 'Raka', age: 22),
+        ),
+        FutureProvider(create: ((context) => Home().fetchAddress),
+        initialData: "Fetching Address",
+        )
+      ],
+    child: MyApp(),
    )
   );
 }
